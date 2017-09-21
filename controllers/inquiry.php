@@ -11,8 +11,11 @@ class inquiry extends Controller{
         
     }
     public function thankYou(){
+        $sfdc = new SFDCConnector();
+        $configJSON = $_POST['configurationJSON'];
+        $leadId = $sfdc->createLead($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['company'], $_POST['city'], $_POST['state'], $_POST['description'], 'a0l46000001JD7KAAW');
         $this->view->renderHeader();
-        $this->view->render("thanks");
+        $this->view->render("thanks", $_POST['first_name']);
         $this->view->renderFooter();
     }
 }
