@@ -10,6 +10,7 @@ class products extends Controller{
      * @var CPQ_Configuration 
      */
     public $Config;
+    
     public function __construct() {
         parent::__construct();
         
@@ -26,17 +27,9 @@ class products extends Controller{
     public function configure(){
         $this->loadModel("CPQ_Configuration", "Config");
         $this->Config->LoadFromId($_GET['pid']);
-        
         $this->view->renderHeader();
-        
-        
-       
         $this->view->render('configuration',$this->Config);
-        
-        
         $this->view->renderFooter();
-    }
-    
+    }   
 }
-
 ?>
