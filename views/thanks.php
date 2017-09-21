@@ -1,6 +1,6 @@
 <!-- Header -->
 <header class="w3-container w3-red w3-text-black w3-center" style="padding:96px 16px">
-  <h1 class="w3-jumbo">Thank you for your Inquiry</h1>
+  <h1 class="w3-jumbo">Thank you <?=$context?>, for your Inquiry</h1>
   <p class="w3-xlarge">You can expect to hear from us promptly</p>
 </header>
 
