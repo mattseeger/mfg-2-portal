@@ -1,4 +1,22 @@
 <div class="w3-container">
+    <script type="text/javascript">
+    function updateModel(e){
+        console.debug('Updating Model ....');
+        for(i=0; i < configuration.options.length; i++){
+                m_op = configuration.options[i];
+                f_in = $("input[value='" + m_op.record.Id + "']")[0];
+                m_op.record.SBQQ__Selected__c = f_in.checked;
+        }
+        document.getElementById("configurationJSON").value = JSON.stringify(configuration);
+        console.debug('Model UPdated');
+    }
+    
+    function attachUpdater(){
+        $(document.configForm).find('input').change(updateModel);
+    }
+    
+    $( document ).ready(attachUpdater);
+    </script>
     <form name="configForm">
         <div class="w3-container w3-threequarter">
             <h2><?= $context->product->Name ?></h2>
@@ -9,6 +27,8 @@
             } 
             ?>
         </div>
+    </form>
+    <form name="leadForm" action="/inquiry/thankYou" method="POST">
         <div class="w3-container w3-quarter">
             <div class=" w3-container w3-top" style="margin-top: 80px;">
                 <h3>Get a Quote</h3>
@@ -48,31 +68,15 @@
                         <td><input  id="state" maxlength="20" name="state" size="20" type="text" class="w3-input w3-animate-input"/></td>
                     </tr>
                 </table>
+                <input type="hidden" name="configurationJSON" id="configurationJSON"/>
+                <input type="hidden" name="description" value="Requested Quote For <?= $context->product->Name ?>" />
                 <!--<div><a class="w3-button w3-red w3-hover-black w3-hover-text-red">Calculate</a></div>-->
-                <div><a class="w3-button w3-black w3-hover-red w3-hover-text-black" href="/inquiry/thankYou">Get a Quote</a></div>
+                <div><input type="submit" class="w3-button w3-black w3-hover-red w3-hover-text-black" value="Get a Quote" /></div>
             </div>
         </div>
     </form>
 </div>
 <script>
-productModel = <?=$context->LoadFromIdJSON ?>;
-function updateModel(){
-    console.debug('Updating Model ....');
-    for(i=0; i < productModel.options.length; i++){
-            m_op = productModel.options[i];
-            f_in = $("input[value='" + m_op.record.Id + "']")[0];
-            m_op.record.SBQQ__Selected__c = f_in.checked;
-    }
-    console.debug('Model UPdated');
-}
-function attachUpdater(){
-    ins = document.forms.configForm.getElementsByTagName('input');
-    for(i=0; i<ins.length; i++){
-        ins[i].addEventListener("change",updateModel);
-    }
-}
-window.document.onload = function(e){
-    attachUpdater();
-}
+configuration = <?=$context->ConfigJSON ?>;
 </script>
 
