@@ -34,6 +34,22 @@ class SFDCConnector {
         $this->login();
     }
     
+    public function describeSObject($object){
+        $soap_data = new stdClass();
+        $soap_data->sObjectType = $object;
+        try{
+            $describeSObject_response = $this->soap->describeSObject($soap_data);
+        }
+        catch(Exception $e){
+            var_dump($this->soap->__getLastRequestHeaders());
+            var_dump($this->soap->__getLastRequest());
+            
+            var_dump($this->soap->__getLastResponseHeaders());
+            var_dump($this->soap->__getLastResponse());
+        }
+        return $describeSObject_response;
+    }
+    
     public function login(){
         $soap_data = new stdClass();
         $soap_data->username = SFDC_API_USER;
@@ -186,5 +202,46 @@ class SFDCConnector {
 
         }
         return $LoadConfigurationByIDResponse->result;
+    }
+    
+    public function CreateOrphanQuote(){
+        $reqXML = new DOMDocument();
+	$s_Envelope = $reqXML->createElementNS ("http://schemas.xmlsoap.org/soap/envelope/" , "s:Envelope");
+	$reqXML->appendChild($s_Envelope);
+
+	$s_Header = $reqXML->createElementNS ("http://schemas.xmlsoap.org/soap/envelope/" , "s:Header");
+	$s_Envelope->appendChild($s_Header);
+
+	$s_Body = $reqXML->createElementNS ("http://schemas.xmlsoap.org/soap/envelope/" , "s:Body");
+	$s_Envelope->appendChild($s_Body);
+
+	$sf_SeassionHeader = $reqXML->createElementNS ("urn:enterprise.soap.sforce.com" , "sf:SessionHeader");
+	$s_Header->appendChild($sf_SeassionHeader);
+
+	$sf_sessionId = $reqXML->createElementNS ("urn:enterprise.soap.sforce.com" , "sf:sessionId", $this->sessionId);
+	$sf_SeassionHeader->appendChild($sf_sessionId);
+
+	$sf_create = $reqXML->createElementNS ("urn:enterprise.soap.sforce.com" , "sf:create");
+	$s_Body->appendChild($sf_create);
+
+	$sf_sObjects = $reqXML->createElementNS ("urn:enterprise.soap.sforce.com" , "sf:sObjects");
+        $sf_sObjects->setAttributeNS ("http://www.w3.org/2001/XMLSchema-instance" , "xsi:type" , "SBQQ__Quote__c");
+	$sf_create->appendChild($sf_sObjects);
+        
+        $quoteExpiration = $reqXML->createElement('SBQQ__ExpirationDate__c', '2017-10-10');
+        $sf_sObjects->appendChild($quoteExpiration);
+        
+        $ch = curl_init($this->serverURL);
+	curl_setopt( $ch, CURLOPT_POST, true );
+	curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml', 'SOAPAction: ""'));
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+	curl_setopt( $ch, CURLOPT_POSTFIELDS, $reqXML->saveXML());
+	$result = curl_exec($ch);
+	curl_close($ch);
+        
+	$resXML = new DOMDocument();
+	$resXML->loadXML($result);
+        $quoteId = $resXML->getElementsByTagName("id")->item(0)->textContent;
+        return $quoteId;
     }
 }
