@@ -2,6 +2,8 @@
 require_once 'CPQ_Feature.php';
 require_once 'CPQ_ProductOption.php';
 require_once 'CPQ_Product.php';
+require_once 'CPQ_ConfigurationAttribute.php';
+
 
 /**
  * Represents a configuration in Salesforce CPQ
@@ -23,19 +25,28 @@ class CPQ_Configuration {
     
     /**
      *
+     * @var CPQ_ConfigurationAttribute[] 
+     */
+    public $configurationAttributes;
+    
+    /**
+     *
      * @var JSON 
      */
-    public $LoadFromIdJSON;
+    public $ConfigJSON;
     
     public function __construct() {
         $this->product = new CPQ_Product();
         $this->features = array();
+        $this->configurationAttributes = array();
         
     }
     public function LoadFromId($configurableProductId){
         $sfdc = new SFDCConnector();
-        $model_json = $sfdc->LoadProductByID($configurableProductId);
-        $this->LoadFromIdJSON = $model_json;
+        //$model_json = $sfdc->LoadProductByID($configurableProductId);
+        $model_json = $sfdc->LoadConfigurationByID($configurableProductId);
+        $this->ConfigJSON = $model_json;
+        
         $model_object = json_decode($model_json);
         
         /*
@@ -45,10 +56,11 @@ class CPQ_Configuration {
         $this->product->Name = $model_object->record->Name;
         $this->product->Description = $model_object->record->Description;
         $this->product->SKU = $model_object->record->ProductCode;
+        $this->product->unitPrice = $model_object->record->PricebookEntries->records[0]->UnitPrice;
         //$this->product->AbsoluteImageURL = "https://mfgqtc.my.salesforce.com/servlet/servlet.ImageServer?id=" . $model_object->record->SBQQ__ProductPictureID__c . "&oid=00D460000000MPU";
         
         /*
-         * Pull the Features from the JSON Model to the PHO Model
+         * Pull the Features from the JSON Model to the PHP Model
          */
         
         foreach($model_object->record->SBQQ__Features__r->records as $f ){
@@ -90,8 +102,27 @@ class CPQ_Configuration {
                     $f->options[] = $po;
                     break;
                 }
-            }
+            }    
         }
-        //var_dump($model_object);
+        $productOptionDescribe = $sfdc->describeSObject('SBQQ__ProductOption__c');
+        
+        foreach($model_object->configurationAttributes as $ca){
+            $cao = new CPQ_ConfigurationAttribute();
+            $cao->Name = $ca->targetFieldName;
+            $cao->DisplayOrder = $ca->displayOrder;
+            foreach($productOptionDescribe->result->fields as $field){
+                if($ca->targetFieldName == $field->name){
+                    $cao->Label = $field->label;
+                    $cao->Type = $field->type;
+                    if($field->type == 'picklist'){
+                        foreach($field->picklistValues as $plv){
+                            $cao->PicklistValues[] = $plv->label;
+                        }
+                    }
+                    break;
+                }
+            }
+            $this->configurationAttributes[] = $cao;
+        }
     }
 }
