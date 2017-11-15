@@ -111,6 +111,20 @@
      <xsd:element name="longitude" type="xsd:double"/>
     </xsd:sequence>
    </xsd:complexType>
+   <xsd:element name="ConfigLoader">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="productId" type="xsd:string" nillable="true"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="ConfigLoaderResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="result" type="xsd:string" nillable="true"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
    <xsd:element name="LoadProductByID">
     <xsd:complexType>
      <xsd:sequence>
@@ -119,6 +133,20 @@
     </xsd:complexType>
    </xsd:element>
    <xsd:element name="LoadProductByIDResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="result" type="xsd:string" nillable="true"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="LoadQuotebyID">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="quoteID" type="xsd:string" nillable="true"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="LoadQuotebyIDResponse">
     <xsd:complexType>
      <xsd:sequence>
       <xsd:element name="result" type="xsd:string" nillable="true"/>
@@ -136,21 +164,69 @@
   <part name="SessionHeader" element="tns:SessionHeader"/>
  </message>
  <!-- Operation Messages -->
+ <message name="ConfigLoaderRequest">
+  <part element="tns:ConfigLoader" name="parameters"/>
+ </message>
+ <message name="ConfigLoaderResponse">
+  <part element="tns:ConfigLoaderResponse" name="parameters"/>
+ </message>
  <message name="LoadProductByIDRequest">
   <part element="tns:LoadProductByID" name="parameters"/>
  </message>
  <message name="LoadProductByIDResponse">
   <part element="tns:LoadProductByIDResponse" name="parameters"/>
  </message>
+ <message name="LoadQuotebyIDRequest">
+  <part element="tns:LoadQuotebyID" name="parameters"/>
+ </message>
+ <message name="LoadQuotebyIDResponse">
+  <part element="tns:LoadQuotebyIDResponse" name="parameters"/>
+ </message>
  <portType name="SalesforceCPQAPIPortType">
+  <operation name="ConfigLoader">
+   <input message="tns:ConfigLoaderRequest"/>
+   <output message="tns:ConfigLoaderResponse"/>
+  </operation>
   <operation name="LoadProductByID">
    <input message="tns:LoadProductByIDRequest"/>
    <output message="tns:LoadProductByIDResponse"/>
   </operation>
+  <operation name="LoadQuotebyID">
+   <input message="tns:LoadQuotebyIDRequest"/>
+   <output message="tns:LoadQuotebyIDResponse"/>
+  </operation>
  </portType>
  <binding name="SalesforceCPQAPIBinding" type="tns:SalesforceCPQAPIPortType">
   <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <operation name="ConfigLoader">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:header use="literal" part="SessionHeader" message="tns:Header"/>
+    <soap:header use="literal" part="CallOptions" message="tns:Header"/>
+    <soap:header use="literal" part="DebuggingHeader" message="tns:Header"/>
+    <soap:header use="literal" part="AllowFieldTruncationHeader" message="tns:Header"/>
+    <soap:body use="literal" parts="parameters"/>
+   </input>
+   <output>
+    <soap:header use="literal" part="DebuggingInfo" message="tns:Header"/>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
   <operation name="LoadProductByID">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:header use="literal" part="SessionHeader" message="tns:Header"/>
+    <soap:header use="literal" part="CallOptions" message="tns:Header"/>
+    <soap:header use="literal" part="DebuggingHeader" message="tns:Header"/>
+    <soap:header use="literal" part="AllowFieldTruncationHeader" message="tns:Header"/>
+    <soap:body use="literal" parts="parameters"/>
+   </input>
+   <output>
+    <soap:header use="literal" part="DebuggingInfo" message="tns:Header"/>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="LoadQuotebyID">
    <soap:operation soapAction=""/>
    <input>
     <soap:header use="literal" part="SessionHeader" message="tns:Header"/>
