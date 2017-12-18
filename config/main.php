@@ -37,7 +37,7 @@ define('SFDC_API_USER', 'api@mfg.qtc.demo');
 /**
  * SFDC Password for Integration
  */
-define('SFDC_API_PASSWORD', 'G00dfellas!');
+define('SFDC_API_PASSWORD', 'c03e884feb3e67f989e55d26f7f1206c4dd716f4');
 
 /**
  * SFDC API Token for Integration
